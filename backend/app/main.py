@@ -3,6 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from app.database import engine
+from app.routes.auth import router as auth_router
+from app.routes.admin import router as admin_router
+from app.routes.responsable import router as responsable_router
+from app.routes.maestro import router as maestro_router
 
 app = FastAPI(
     title="Sistema de Control de Asistencias",
@@ -16,6 +20,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Rutas
+app.include_router(auth_router)
+app.include_router(admin_router)
+app.include_router(responsable_router)
+app.include_router(maestro_router)
 
 
 @app.get("/")

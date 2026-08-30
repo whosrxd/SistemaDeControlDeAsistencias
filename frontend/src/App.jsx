@@ -1,21 +1,31 @@
-import { useEffect, useState } from "react";
+import Login from "./pages/Login/Login";
+import Admin from "./pages/Admin";
+import Maestro from "./pages/Maestro";
 
 function App() {
-  const [mensaje, setMensaje] = useState("");
+    const token = localStorage.getItem("token");
+    const rol = localStorage.getItem("rol");
 
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/")
-      .then((response) => response.json())
-      .then((data) => setMensaje(data.mensaje))
-      .catch(() => setMensaje("No se pudo conectar con el backend"));
-  }, []);
+    // No hay sesión
+    if (!token) {
+        return <Login />;
+    }
 
-  return (
-    <div>
-      <h1>Sistema de Control de Asistencias</h1>
-      <p>{mensaje}</p>
-    </div>
-  );
+    // Administrador
+    if (rol === "admin") {
+        return <Admin />;
+    }
+
+    // Maestro
+    if (rol === "maestro") {
+        return <Maestro />;
+    }
+
+    // Rol desconocido
+    localStorage.removeItem("token");
+    localStorage.removeItem("rol");
+
+    return <Login />;
 }
 
 export default App;

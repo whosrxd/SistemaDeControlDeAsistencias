@@ -183,3 +183,13 @@
     font-size: 18px;
   }
 }
+
+@media (max-width: 380px) {
+  .login-page {
+    padding: 16px;
+  }
+
+  .login-card {
+    padding: 28px 20px;
+  }
+}

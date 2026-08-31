@@ -35,7 +35,8 @@ class Horario(Base):
             "miércoles",
             "jueves",
             "viernes",
-            "sábado"
+            "sábado",
+            "domingo"
         ),
         nullable=False
     )

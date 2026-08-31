@@ -561,6 +561,7 @@ def crear_horario(
     db: Session = Depends(get_db),
     usuario: Usuario = Depends(requiere_rol("admin"))
 ):
+    # Validar maestro
     maestro = db.query(Maestro).filter(
         Maestro.id == datos.maestro_id
     ).first()
@@ -571,6 +572,7 @@ def crear_horario(
             detail="Maestro no encontrado"
         )
 
+    # Validar materia
     materia = db.query(Materia).filter(
         Materia.id == datos.materia_id
     ).first()
@@ -581,6 +583,7 @@ def crear_horario(
             detail="Materia no encontrada"
         )
 
+    # Validar aula
     aula = db.query(Aula).filter(
         Aula.id == datos.aula_id
     ).first()
@@ -590,6 +593,44 @@ def crear_horario(
             status_code=404,
             detail="Aula no encontrada"
         )
+
+    # ==========================================
+    # VALIDAR CONFLICTOS DE HORARIO
+    # ==========================================
+
+    horarios = db.query(Horario).filter(
+        Horario.dia_semana == datos.dia_semana,
+        Horario.activo == True
+    ).all()
+
+    for horario in horarios:
+
+        # Comprobar si los horarios se traslapan
+        hay_conflicto = (
+            datos.hora_inicio < horario.hora_fin
+            and datos.hora_fin > horario.hora_inicio
+        )
+
+        if not hay_conflicto:
+            continue
+
+        # El maestro ya tiene una clase a esa hora
+        if horario.maestro_id == datos.maestro_id:
+            raise HTTPException(
+                status_code=400,
+                detail="El maestro ya tiene una clase programada en este horario"
+            )
+
+        # El aula ya está ocupada
+        if horario.aula_id == datos.aula_id:
+            raise HTTPException(
+                status_code=400,
+                detail="El aula ya está ocupada en este horario"
+            )
+
+    # ==========================================
+    # CREAR HORARIO
+    # ==========================================
 
     nuevo_horario = Horario(
         maestro_id=datos.maestro_id,
@@ -618,7 +659,6 @@ def crear_horario(
             "activo": nuevo_horario.activo
         }
     }
-
 
 @router.put("/horarios/{horario_id}")
 def editar_horario(

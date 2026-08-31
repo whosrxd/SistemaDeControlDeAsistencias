@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "/api";
 
 // Login
 
@@ -395,6 +395,196 @@ export async function obtenerHorariosMaestro() {
     if (!response.ok) {
         throw new Error(
             data.detail || "No se pudieron obtener los horarios"
+        );
+    }
+
+    return data;
+}
+
+export async function registrarAsistencia(qr_token) {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(`${API_URL}/maestro/asistencia`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+            qr_token,
+        }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.detail || "Error al registrar asistencia");
+    }
+
+    return data;
+}
+
+export async function obtenerResumenResponsable() {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+        `${API_URL}/responsable/resumen`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            data.detail || "No se pudo obtener el resumen"
+        );
+    }
+
+    return data;
+}
+
+export async function obtenerHorariosResponsable() {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+        `${API_URL}/responsable/horarios`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            data.detail || "No se pudieron obtener los horarios"
+        );
+    }
+
+    return data;
+}
+
+export async function registrarAsistenciaManual(datos) {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+        `${API_URL}/responsable/asistencia`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(datos),
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            data.detail || "No se pudo registrar la asistencia"
+        );
+    }
+
+    return data;
+}
+
+export const obtenerAsistenciasResponsable = async (filtros = {}) => {
+    const token = localStorage.getItem("token");
+
+    const params = new URLSearchParams();
+
+    if (filtros.fecha) {
+        params.append("fecha", filtros.fecha);
+    }
+
+    if (filtros.maestro_id) {
+        params.append("maestro_id", filtros.maestro_id);
+    }
+
+    if (filtros.materia_id) {
+        params.append("materia_id", filtros.materia_id);
+    }
+
+    if (filtros.aula_id) {
+        params.append("aula_id", filtros.aula_id);
+    }
+
+    if (filtros.estado) {
+        params.append("estado", filtros.estado);
+    }
+
+    if (filtros.tipo_registro) {
+        params.append("tipo_registro", filtros.tipo_registro);
+    }
+
+    const query = params.toString();
+
+    const response = await fetch(
+        `${API_URL}/responsable/asistencias${query ? `?${query}` : ""}`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            data.detail || "Error al obtener asistencias"
+        );
+    }
+
+    return data;
+};
+
+export async function obtenerAsistenciasMaestro() {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+        `${API_URL}/maestro/asistencias`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            data.detail || "No se pudieron obtener las asistencias"
+        );
+    }
+
+    return data;
+}
+
+// Dashboard
+export async function obtenerDashboard() {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(`${API_URL}/admin/dashboard`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            data.detail || "No se pudo obtener el dashboard"
         );
     }
 
